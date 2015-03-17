@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.eclipse.leshan</groupId>
+		<artifactId>leshan-osgi-parent</artifactId>
+		<version>0.1.10-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>leshan-osgi</artifactId>
+	<packaging>bundle</packaging>
+
+	<name>leshan-OSGi :: Leshan Server OSGi Bundle</name>
+	<description>Leshan Server as OSGi Bundle</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.leshan</groupId>
+			<artifactId>leshan-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.leshan</groupId>
+			<artifactId>leshan-server-core</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-slf4j-impl</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.leshan</groupId>
+			<artifactId>leshan-server-cf</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.californium</groupId>
+			<artifactId>californium-osgi</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.californium</groupId>
+			<artifactId>scandium</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+
+		<!-- ******************************** -->
+		<!-- ********* TEST ***************** -->
+		<!-- ******************************** -->
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+</project>
