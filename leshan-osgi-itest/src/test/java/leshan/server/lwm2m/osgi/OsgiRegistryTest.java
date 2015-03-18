@@ -26,8 +26,8 @@ import java.util.Map;
 
 import org.eclipse.leshan.LinkObject;
 import org.eclipse.leshan.core.request.BindingMode;
-import org.eclipse.leshan.core.request.UpdateRequest;
 import org.eclipse.leshan.server.client.Client;
+import org.eclipse.leshan.server.client.ClientUpdate;
 import org.eclipse.leshan.util.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -126,8 +126,8 @@ public class OsgiRegistryTest extends TestSetupConfig {
         final Map<String, String> attribs = new HashMap<>();
         final LinkObject[] objectLinks = new LinkObject[] { new LinkObject("/3/1", attribs) };
 
-        final UpdateRequest up = new UpdateRequest(client.getRegistrationId(), client.getAddress(), client.getPort(),
-                updateLifetime, updateSms, updatebinding, objectLinks, client.getRegistrationDate());
+        final ClientUpdate up = new ClientUpdate(client.getRegistrationId(), client.getAddress(), client.getPort(),
+            updateLifetime, updateSms, updatebinding, objectLinks);
         osgiRegistry.updateClient(up);
         ref = findByRegistrationId(client.getRegistrationId());
         final LWM2MClientDevice device = context.getService(ref);
@@ -139,13 +139,13 @@ public class OsgiRegistryTest extends TestSetupConfig {
         // device.getClient().getObjectLinks());
         final String updatedExpiry = (String) ref.getProperty(Property.REGISTRATION_EXPIRATION);
         Assert.assertTrue("Expiration should have been extended after updating Client",
-                Long.valueOf(originalExpiry) < Long.valueOf(updatedExpiry));
+            Long.valueOf(originalExpiry) < Long.valueOf(updatedExpiry));
     }
 
     private ServiceReference<LWM2MClientDevice> findByRegistrationId(final String id) throws InvalidSyntaxException {
         final String query = String.format("(%s=%s)", Property.REGISTRATION_ID, id);
         final Collection<ServiceReference<LWM2MClientDevice>> col = context.getServiceReferences(
-                LWM2MClientDevice.class, query);
+            LWM2MClientDevice.class, query);
         if (!col.isEmpty()) {
             return col.iterator().next();
         } else {
@@ -210,7 +210,7 @@ public class OsgiRegistryTest extends TestSetupConfig {
                 new LinkObject("/1", attribs), new LinkObject("/1/52343", attribs),
                 new LinkObject("/13/52343", attribs), new LinkObject("/567/45", attribs) };
         final Client c = new Client(registrationId, endpoint, address, port, lwM2mVersion, lifetimeInSec, smsNumber,
-                bindingMode, objectLinks, InetSocketAddress.createUnresolved("localhost", 5683));
+            bindingMode, objectLinks, InetSocketAddress.createUnresolved("localhost", 5683));
 
         return c;
     }

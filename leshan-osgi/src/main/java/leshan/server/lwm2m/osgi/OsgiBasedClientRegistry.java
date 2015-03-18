@@ -32,10 +32,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.leshan.LinkObject;
 import org.eclipse.leshan.core.request.BindingMode;
-import org.eclipse.leshan.core.request.UpdateRequest;
 import org.eclipse.leshan.server.client.Client;
 import org.eclipse.leshan.server.client.ClientRegistry;
 import org.eclipse.leshan.server.client.ClientRegistryListener;
+import org.eclipse.leshan.server.client.ClientUpdate;
 import org.eclipse.leshan.server.request.LwM2mRequestSender;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -105,27 +105,27 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
     }
 
     @Override
-    public Client registerClient(final Client client) {
+    public boolean registerClient(final Client client) {
 
         // Instantiate LWM2MDevice as wrapper around Client object and
         // register as DEVICE in OSGi registry
         final LWM2MClientDevice lwm2mclient = new LWM2MClientDevice(client, requestSender);
-        final Client staleClient = registerClientAtOsgiRegistry(lwm2mclient);
+        registerClientAtOsgiRegistry(lwm2mclient);
 
         for (final ClientRegistryListener crl : crListeners) {
             crl.registered(client);
         }
-        return staleClient;
+        return true;
 
     }
 
     @Override
-    public Client updateClient(final UpdateRequest clientUpdated) {
-        final ServiceRegistration<LWM2MClientDevice> registration = getServiceRegistrationById(clientUpdated
-                .getRegistrationId());
+    public Client updateClient(final ClientUpdate clientUpdate) {
+        final ServiceRegistration<LWM2MClientDevice> registration = getServiceRegistrationById(clientUpdate
+            .getRegistrationId());
         if (registration == null) {
             LOG.warn("updateClient(); return null: no client is registered under the given Registration-ID {}",
-                    clientUpdated.getRegistrationId());
+                clientUpdate.getRegistrationId());
             return null;
         }
 
@@ -133,8 +133,8 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
         final LWM2MClientDevice device = context.getService(ref);
 
         if (device != null) {
-            LOG.debug("Updating registration for client: {}", clientUpdated);
-            applyUpdate(device, clientUpdated);
+            LOG.debug("Updating registration for client: {}", clientUpdate);
+            applyUpdate(device, clientUpdate);
 
             final Dictionary<String, Object> newProps = device.getServiceRegistrationProperties(device.getClient());
             registration.setProperties(newProps);
@@ -146,8 +146,8 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
             return device.getClient();
         } else {
             LOG.warn(String.format(
-                    "updateClient(); return null: no LWM2MClientDevice is found under the given Registration-ID %s",
-                    clientUpdated.getRegistrationId()));
+                "updateClient(); return null: no LWM2MClientDevice is found under the given Registration-ID %s",
+                clientUpdate.getRegistrationId()));
 
             return null;
         }
@@ -166,11 +166,11 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
 
             if (registrations.remove(device.getClient().getEndpoint()) == null) {
                 LOG.warn(String.format("[deregisterClient()] no Service found with endpointID = %s", device.getClient()
-                        .getEndpoint()));
+                    .getEndpoint()));
             }
             LOG.debug(String.format(
-                    "[deregisterClient()] ungetService and unregister Client with endpointID=%s  ,id=%s", device
-                            .getClient().getEndpoint(), device.getClient().getRegistrationId()));
+                "[deregisterClient()] ungetService and unregister Client with endpointID=%s  ,id=%s", device
+                .getClient().getEndpoint(), device.getClient().getRegistrationId()));
 
             for (final ClientRegistryListener crl : crListeners) {
                 crl.unregistered(device.getClient());
@@ -203,12 +203,12 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
 
         if (!(registrations.containsKey(client.getClient().getEndpoint()))) {
             LOG.trace(
-                    "[registerClientAtOsgiRegistry()] Register new LWM2MClientDevice at osgi ServiceRegistry with ep= {}",
-                    client.getClient().getEndpoint());
+                "[registerClientAtOsgiRegistry()] Register new LWM2MClientDevice at osgi ServiceRegistry with ep= {}",
+                client.getClient().getEndpoint());
             registerService(client);
 
             LOG.trace(String.format("[registerClientAtOsgiRegistry()] origin host: %s", client.getClient().getAddress()
-                    .toString()));
+                .toString()));
 
         } else {
             LOG.trace("[registerClientAtOsgiRegistry()] update a LWM2MClientDevice Servicereference while clientregistration");
@@ -247,15 +247,15 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
                 }
 
                 LOG.trace(String.format("[registerClientAtOsgiRegistry()] changed host: %s", client.getClient()
-                        .getAddress().toString()));
+                    .getAddress().toString()));
             } catch (final IllegalStateException e) {
                 // IllegalStateException - If this ServiceRegistration object
                 // has already been unregistered
                 registerService(client);
 
                 LOG.warn(
-                        "[registerClientAtOsgiRegistry()] ServiceRegistration object has already been unregistered, register again.",
-                        e);
+                    "[registerClientAtOsgiRegistry()] ServiceRegistration object has already been unregistered, register again.",
+                    e);
             }
         }
         // return null because no stale registration info exists for the
@@ -270,7 +270,7 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
      */
     private void registerService(final LWM2MClientDevice client) {
         final ServiceRegistration<LWM2MClientDevice> registration = context.registerService(LWM2MClientDevice.class,
-                client, client.getServiceRegistrationProperties(client.getClient()));
+            client, client.getServiceRegistrationProperties(client.getClient()));
 
         registrations.put(client.getClient().getEndpoint(), registration);
     }
@@ -287,7 +287,7 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
         return null;
     }
 
-    private void applyUpdate(final LWM2MClientDevice device, final UpdateRequest update) {
+    private void applyUpdate(final LWM2MClientDevice device, final ClientUpdate update) {
         if (device == null) {
             LOG.warn("no client to update");
             return;
@@ -338,8 +338,8 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
             }
 
             final Client clientUpdated = new Client(cl.getRegistrationId(), cl.getEndpoint(), address, port,
-                    cl.getLwM2mVersion(), lifetime, sms, bindingMode, lobj, cl.getRegistrationEndpointAddress(),
-                    cl.getRegistrationDate(), lastUpdate);
+                cl.getLwM2mVersion(), lifetime, sms, bindingMode, lobj, cl.getRegistrationEndpointAddress(),
+                cl.getRegistrationDate(), lastUpdate);
 
             device.updateClient(clientUpdated);
         }
@@ -383,10 +383,10 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
                     if (lwmClient != null) {
                         if (lwmClient.isAlive()) {
                             LOG.trace(String.format("[Cleaner]: client: %s, id: %s, alive", lwmClient.getClient()
-                                    .getEndpoint(), lwmClient.getClient().getRegistrationId()));
+                                .getEndpoint(), lwmClient.getClient().getRegistrationId()));
                         } else {
                             LOG.trace(String.format("[Cleaner]: client: %s, id:%s deregisterd", lwmClient.getClient()
-                                    .getEndpoint(), lwmClient.getClient().getRegistrationId()));
+                                .getEndpoint(), lwmClient.getClient().getRegistrationId()));
                             deregisterClient(lwmClient.getClient().getRegistrationId());
                         }
                     }
@@ -394,8 +394,8 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
                     // IllegalStateException - If this ServiceRegistration
                     // object has already been unregistered.
                     LOG.warn(String
-                            .format("[Cleaner]: Device ServiceRegistration object with endpointId %s has already been unregistered: ",
-                                    e.getKey()));
+                        .format("[Cleaner]: Device ServiceRegistration object with endpointId %s has already been unregistered: ",
+                            e.getKey()));
                 }
             }
         }
