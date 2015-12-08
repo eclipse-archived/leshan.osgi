@@ -26,16 +26,14 @@ import java.util.Map;
 
 import org.eclipse.leshan.LinkObject;
 import org.eclipse.leshan.ObserveSpec;
-import org.eclipse.leshan.core.node.LwM2mResource;
-import org.eclipse.leshan.core.node.Value;
 import org.eclipse.leshan.core.request.BindingMode;
-import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.DiscoverRequest;
 import org.eclipse.leshan.core.request.ExecuteRequest;
 import org.eclipse.leshan.core.request.ObserveRequest;
 import org.eclipse.leshan.core.request.ReadRequest;
 import org.eclipse.leshan.core.request.WriteAttributesRequest;
 import org.eclipse.leshan.core.request.WriteRequest;
+import org.eclipse.leshan.core.request.WriteRequest.Mode;
 import org.eclipse.leshan.server.client.Client;
 import org.eclipse.leshan.server.request.LwM2mRequestSender;
 import org.eclipse.leshan.util.RandomStringUtils;
@@ -51,6 +49,8 @@ import org.mockito.runners.MockitoJUnitRunner;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class LWM2MClientDeviceTest {
+
+    private static final long DEFAULT_REQUEST_TIMEOUT_MILLIS = 2000L;
 
     @Mock
     LwM2mRequestSender lwM2mRequestSenderMock;
@@ -69,18 +69,18 @@ public class LWM2MClientDeviceTest {
         final LWM2MClientDevice clientUnderTest = new LWM2MClientDevice(client, lwM2mRequestSenderMock);
         clientUnderTest.read(readRequest);
 
-        verify(lwM2mRequestSenderMock).send(client, readRequest);
+        verify(lwM2mRequestSenderMock).send(client, readRequest, DEFAULT_REQUEST_TIMEOUT_MILLIS);
     }
 
     @Test
     public void testWrite() throws UnsupportedEncodingException, InterruptedException, UnknownHostException {
 
-        final WriteRequest readRequest = new WriteRequest(3, 0, 9, getBatteryLevelTestResources(), ContentFormat.TEXT,
-                false);
+        final WriteRequest writeRequest =
+                new WriteRequest(Mode.REPLACE, 3, 0, 9, 55L); // new battery level: 55%
         final LWM2MClientDevice clientUnderTest = new LWM2MClientDevice(client, lwM2mRequestSenderMock);
-        clientUnderTest.write(readRequest);
+        clientUnderTest.write(writeRequest);
 
-        verify(lwM2mRequestSenderMock).send(client, readRequest);
+        verify(lwM2mRequestSenderMock).send(client, writeRequest, DEFAULT_REQUEST_TIMEOUT_MILLIS);
     }
 
     @Test
@@ -90,7 +90,7 @@ public class LWM2MClientDeviceTest {
         final LWM2MClientDevice clientUnderTest = new LWM2MClientDevice(client, lwM2mRequestSenderMock);
         clientUnderTest.writeAttribute(readRequest);
 
-        verify(lwM2mRequestSenderMock).send(client, readRequest);
+        verify(lwM2mRequestSenderMock).send(client, readRequest, DEFAULT_REQUEST_TIMEOUT_MILLIS);
     }
 
     @Test
@@ -100,7 +100,7 @@ public class LWM2MClientDeviceTest {
         final LWM2MClientDevice clientUnderTest = new LWM2MClientDevice(client, lwM2mRequestSenderMock);
         clientUnderTest.execute(readRequest);
 
-        verify(lwM2mRequestSenderMock).send(client, readRequest);
+        verify(lwM2mRequestSenderMock).send(client, readRequest, DEFAULT_REQUEST_TIMEOUT_MILLIS);
     }
 
     @Test
@@ -110,7 +110,7 @@ public class LWM2MClientDeviceTest {
         final LWM2MClientDevice clientUnderTest = new LWM2MClientDevice(client, lwM2mRequestSenderMock);
         clientUnderTest.observe(readRequest);
 
-        verify(lwM2mRequestSenderMock).send(client, readRequest);
+        verify(lwM2mRequestSenderMock).send(client, readRequest, DEFAULT_REQUEST_TIMEOUT_MILLIS);
     }
 
     @Test
@@ -120,18 +120,11 @@ public class LWM2MClientDeviceTest {
         final LWM2MClientDevice clientUnderTest = new LWM2MClientDevice(client, lwM2mRequestSenderMock);
         clientUnderTest.discover(readRequest);
 
-        verify(lwM2mRequestSenderMock).send(client, readRequest);
-    }
-
-    private LwM2mResource getBatteryLevelTestResources() {
-        final Value<Integer> v = Value.newIntegerValue(9);
-
-        return new LwM2mResource(9, v);
+        verify(lwM2mRequestSenderMock).send(client, readRequest, DEFAULT_REQUEST_TIMEOUT_MILLIS);
     }
 
     private ObserveSpec ObserveSpec() {
         return new ObserveSpec.Builder().build();
-
     }
 
     private Client newClient() throws UnknownHostException {
@@ -139,7 +132,7 @@ public class LWM2MClientDeviceTest {
         final String endpoint = "test" + registrationId;
         final InetAddress address = InetAddress.getLocalHost();
         final int port = 5683;
-        final String lwM2mVersion = "0.1.1";
+        final String lwM2mVersion = "1.0";
         final Long lifetimeInSec = 10000L;
         final String smsNumber = "0170" + RandomStringUtils.random(7, false, true);
         final BindingMode bindingMode = BindingMode.U;

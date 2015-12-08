@@ -38,6 +38,7 @@ import org.eclipse.leshan.server.client.ClientRegistryListener;
 import org.eclipse.leshan.server.client.ClientUpdate;
 import org.eclipse.leshan.server.request.LwM2mRequestSender;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
@@ -50,7 +51,6 @@ import org.slf4j.LoggerFactory;
 public class OsgiBasedClientRegistry implements ClientRegistry {
 
     private static final Logger LOG = LoggerFactory.getLogger(OsgiBasedClientRegistry.class);
-
     private final BundleContext context;
     private final LwM2mRequestSender requestSender;
     private final Map<String, ServiceRegistration<LWM2MClientDevice>> registrations = new ConcurrentHashMap<String, ServiceRegistration<LWM2MClientDevice>>();
@@ -277,8 +277,7 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
 
     protected ServiceRegistration<LWM2MClientDevice> getServiceRegistrationById(final String registrationId) {
 
-        final Collection<ServiceRegistration<LWM2MClientDevice>> all = registrations.values();
-        for (final ServiceRegistration<LWM2MClientDevice> sreg : all) {
+        for (final ServiceRegistration<LWM2MClientDevice> sreg : registrations.values()) {
             final String id = (String) sreg.getReference().getProperty(Property.REGISTRATION_ID);
             if (registrationId.equals(id)) {
                 return sreg;
@@ -398,6 +397,23 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
                             e.getKey()));
                 }
             }
+        }
+    }
+
+    @Override
+    public Client findByRegistrationId(final String id) {
+        try {
+            Collection<ServiceReference<LWM2MClientDevice>> result =
+                    context.getServiceReferences(LWM2MClientDevice.class, String.format("(%s=%s)", Property.REGISTRATION_ID, id));
+            if (result.isEmpty()) {
+                return null;
+            } else {
+                LWM2MClientDevice device = context.getService(result.iterator().next());
+                return device.getClient();
+            }
+        } catch (InvalidSyntaxException e) {
+            LOG.error("Cannot retrieve LWM2M Client frmo OSGi registry", e);
+            return null;
         }
     }
 

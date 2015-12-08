@@ -23,8 +23,9 @@ import leshan.server.lwm2m.osgi.Property;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.server.client.Client;
-import org.eclipse.leshan.server.observation.Observation;
-import org.eclipse.leshan.server.observation.ObservationListener;
+import org.eclipse.leshan.server.client.ClientRegistry;
+import org.eclipse.leshan.core.observation.Observation;
+import org.eclipse.leshan.core.observation.ObservationListener;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
@@ -41,6 +42,7 @@ public class Lwm2mEventPublisher implements ObservationListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(Lwm2mEventPublisher.class);
     private final BundleContext context;
+    private final ClientRegistry clientRegistry;
 
     /**
      * Constructor for new Lwm2mEventPublisher. The Lwm2mEventPublisher
@@ -48,26 +50,35 @@ public class Lwm2mEventPublisher implements ObservationListener {
      * the observed resources.
      *
      * @param bundleContext
+     * @param clientRegistry the LWM2M client registry to use for looking up clients by registration id.
      */
-    public Lwm2mEventPublisher(final BundleContext bundleContext) {
-        context = bundleContext;
+    public Lwm2mEventPublisher(final BundleContext bundleContext, final ClientRegistry clientRegistry) {
+        if (bundleContext == null) {
+            throw new NullPointerException("Bundle context must not be null");
+        } else if (clientRegistry == null) {
+            throw new NullPointerException("Client registry must not be null");
+        } else {
+            this.context = bundleContext;
+            this.clientRegistry = clientRegistry;
+        }
     }
 
     @Override
     public void newValue(final Observation observation, final LwM2mNode node) {
 
-        final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-
         if (node == null || observation == null) {
-            throw new IllegalArgumentException("Missing required propertie");
+            throw new NullPointerException("Missing required property");
         } else {
+            Client client = clientRegistry.findByRegistrationId(observation.getRegistrationId());
+            if (client != null) {
+                final Dictionary<String, Object> properties = new Hashtable<String, Object>();
+                properties.put(Property.LWM2MNODE, node);
+                properties.put(Property.LWM2MPATH, observation.getPath());
+                properties.put(Property.CLIENT, client);
 
-            properties.put(Property.LWM2MNODE, node);
-            properties.put(Property.LWM2MPATH, observation.getPath());
-            properties.put(Property.CLIENT, observation.getClient());
-
-            sendEvent(observation.getClient(), observation.getPath(), properties);
-            LOG.trace("Received new value for observation from: {}", observation.getClient().getEndpoint());
+                sendEvent(client, observation.getPath(), properties);
+                LOG.trace("Received new value for observation from: {}", client.getEndpoint());
+            }
         }
     }
 
@@ -78,7 +89,7 @@ public class Lwm2mEventPublisher implements ObservationListener {
 
     private void sendEvent(final Client client, final LwM2mPath path, final Dictionary<String, Object> properties) {
 
-        final ServiceReference<?> ref = context.getServiceReference(EventAdmin.class.getName());
+        final ServiceReference<EventAdmin> ref = context.getServiceReference(EventAdmin.class);
         if (ref != null) {
 
             final StringBuilder topic = new StringBuilder();
@@ -93,7 +104,7 @@ public class Lwm2mEventPublisher implements ObservationListener {
             final Event notifyEvent = new Event(topic.toString(), properties);
 
             // postEvent sends events asynchronously -> Method does not block
-            final EventAdmin eventAdmin = (EventAdmin) context.getService(ref);
+            final EventAdmin eventAdmin = context.getService(ref);
             eventAdmin.postEvent(notifyEvent);
             LOG.trace("Sending event to topic {}", topic.toString());
         }

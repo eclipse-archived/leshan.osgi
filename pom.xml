@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.eclipse.leshan</groupId>
 		<artifactId>leshan</artifactId>
-		<version>0.1.10</version>
+		<version>0.1.11-M7-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>leshan-osgi-parent</artifactId>
@@ -16,37 +16,37 @@
 	<properties>
 		<osgi.version>5.0.0</osgi.version>
 		<org.eclipse.osgi.version>3.10.0-v20140606-1445</org.eclipse.osgi.version>
-		<pax.version>4.2.0</pax.version>	
-		<scandium.version>1.0.0-SNAPSHOT</scandium.version>
+		<pax.version>4.2.0</pax.version>
+		<californium.version>1.0.0</californium.version>
 	</properties>
 
 	<modules>
 		<module>leshan-osgi</module>
 		<module>leshan-osgi-itest</module>
 	</modules>
-	
-	    <developers>
-        <developer>
-            <id>aellwein</id>
-            <name>Alexander Ellwein</name>
-            <email>alexander.ellwein@bosch-si.com</email>
-            <organization>Bosch Software Innovations GmbH</organization>
-            <organizationUrl>http://www.bosch-si.com</organizationUrl>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-        <developer>
-             <id>ischaal</id>
-            <name>Ingo Schaal</name>
-            <email>ingo.schaal@bosch-si.com</email>
-            <organization>Bosch Software Innovations GmbH</organization>
-            <organizationUrl>http://www.bosch-si.com</organizationUrl>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-    </developers>
+
+	<developers>
+		<developer>
+			<id>aellwein</id>
+			<name>Alexander Ellwein</name>
+			<email>alexander.ellwein@bosch-si.com</email>
+			<organization>Bosch Software Innovations GmbH</organization>
+			<organizationUrl>http://www.bosch-si.com</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>ischaal</id>
+			<name>Ingo Schaal</name>
+			<email>ingo.schaal@bosch-si.com</email>
+			<organization>Bosch Software Innovations GmbH</organization>
+			<organizationUrl>http://www.bosch-si.com</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
 
 	<build>
 		<pluginManagement>
@@ -88,96 +88,62 @@
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
-				</plugin>				
+				</plugin>
 			</plugins>
 		</pluginManagement>
-		
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.3.7</version>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Private-Package>
-							leshan.server.lwm2m.client.osgi
-						</Private-Package>
-						<Import-Package>
-							org.eclipse.californium.*;version="[${californium.version}, 2)",
-							leshan.server.lwm2m.*;version="${project.version}",
-							org.apache.commons.lang.*;version="[2.6, 3)",
-							*
-						</Import-Package>
-						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-					</instructions>
-				</configuration>
-			</plugin>
-		</plugins>
 	</build>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>org.eclipse.leshan</groupId>
+				<groupId>${project.groupId}</groupId>
 				<artifactId>leshan-core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>leshan-server-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>leshan-server-cf</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>leshan-client-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>leshan-client-cf</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>org.eclipse.californium</groupId>
 				<artifactId>californium-osgi</artifactId>
 				<version>${californium.version}</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.eclipse.californium</groupId>
 				<artifactId>scandium</artifactId>
-				<version>${scandium.version}</version>
+				<version>${californium.version}</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.osgi</groupId>
 				<artifactId>org.osgi.compendium</artifactId>
-				<scope>provided</scope>
-				<version>${osgi.version}</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>org.osgi</groupId>
-				<artifactId>org.osgi.core</artifactId>
-				<scope>provided</scope>
 				<version>${osgi.version}</version>
 			</dependency>
 
-			<!-- ******************************** -->
-			<!-- ********* TEST ***************** -->
-			<!-- ******************************** -->
 			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-all</artifactId>
-				<version>1.9.5</version>
-				<scope>test</scope>
+				<groupId>org.osgi</groupId>
+				<artifactId>org.osgi.core</artifactId>
+				<version>${osgi.version}</version>
 			</dependency>
-			
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.11</version>
-				<scope>test</scope>
-			</dependency>
-			
 		</dependencies>
 	</dependencyManagement>
-	
 </project>

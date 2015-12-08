@@ -25,9 +25,37 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.leshan.LinkObject;
+import org.eclipse.leshan.ObserveSpec;
+import org.eclipse.leshan.client.LwM2mClient;
+import org.eclipse.leshan.client.californium.LeshanClient;
+import org.eclipse.leshan.client.request.LwM2mClientRequestSender;
+import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
+import org.eclipse.leshan.client.util.LinkFormatHelper;
+import org.eclipse.leshan.core.model.ResourceModel;
+import org.eclipse.leshan.core.model.json.ObjectModelSerializer;
+import org.eclipse.leshan.core.node.LwM2mNode;
+import org.eclipse.leshan.core.node.codec.LwM2mNodeEncoder;
+import org.eclipse.leshan.core.node.codec.json.LwM2mNodeJsonDecoder;
+import org.eclipse.leshan.core.node.codec.opaque.LwM2mNodeOpaqueDecoder;
+import org.eclipse.leshan.core.node.codec.text.LwM2mNodeTextDecoder;
+import org.eclipse.leshan.core.node.codec.tlv.LwM2mNodeTlvEncoder;
+import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.core.request.BindingMode;
+import org.eclipse.leshan.core.request.LwM2mRequest;
+import org.eclipse.leshan.core.request.exception.ResourceAccessException;
+import org.eclipse.leshan.core.response.LwM2mResponse;
+import org.eclipse.leshan.json.LwM2mJson;
+import org.eclipse.leshan.server.LwM2mServer;
+import org.eclipse.leshan.server.bootstrap.SecurityMode;
+import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.client.Client;
 import org.eclipse.leshan.server.client.ClientUpdate;
+import org.eclipse.leshan.server.model.LwM2mModelProvider;
+import org.eclipse.leshan.server.observation.ObservationRegistry;
+import org.eclipse.leshan.server.registration.RegistrationHandler;
+import org.eclipse.leshan.server.request.LwM2mRequestSender;
+import org.eclipse.leshan.server.security.SecurityInfo;
+import org.eclipse.leshan.tlv.Tlv;
 import org.eclipse.leshan.util.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,6 +74,51 @@ import org.osgi.framework.ServiceReference;
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class OsgiRegistryTest extends TestSetupConfig {
+
+    private static final String[] LESHAN_CORE_CLASSES_TO_LOAD = new String[]{
+                            // one class from each exported package
+                            ObserveSpec.class.getName(),
+                            ResourceModel.class.getName(),
+                            ObjectModelSerializer.class.getName(),
+                            LwM2mNode.class.getName(),
+                            LwM2mNodeEncoder.class.getName(),
+                            LwM2mNodeJsonDecoder.class.getName(),
+                            LwM2mNodeOpaqueDecoder.class.getName(),
+                            LwM2mNodeTextDecoder.class.getName(),
+                            LwM2mNodeTlvEncoder.class.getName(),
+                            Observation.class.getName(),
+                            LwM2mRequest.class.getName(),
+                            ResourceAccessException.class.getName(),
+                            LwM2mResponse.class.getName(),
+                            LwM2mJson.class.getName(),
+                            Tlv.class.getName()
+    };
+    private static final String[] LESHAN_SERVER_CORE_CLASSES_TO_LOAD = new String[]{
+                            // one class from each exported package
+                            LwM2mServer.class.getName(),
+                            SecurityMode.class.getName(),
+                            Client.class.getName(),
+                            LwM2mModelProvider.class.getName(),
+                            ObservationRegistry.class.getName(),
+                            RegistrationHandler.class.getName(),
+                            LwM2mRequestSender.class.getName(),
+                            SecurityInfo.class.getName()
+    };
+    private static final String[] LESHAN_SERVER_CF_CLASSES_TO_LOAD = new String[]{
+                            // one class from each exported package
+                            LeshanServerBuilder.class.getName()
+    };
+    private static final String[] LESHAN_CLIENT_CORE_CLASSES_TO_LOAD = new String[]{
+                            // one class from each exported package
+                            LwM2mClient.class.getName(),
+                            LwM2mClientRequestSender.class.getName(),
+                            LwM2mObjectEnabler.class.getName(),
+                            LinkFormatHelper.class.getName()
+    };
+    private static final String[] LESHAN_CLIENT_CF_CLASSES_TO_LOAD = new String[]{
+                            // one class from each exported package
+                            LeshanClient.class.getName()
+    };
 
     @Test
     public void checkBundleContext() {
@@ -86,17 +159,15 @@ public class OsgiRegistryTest extends TestSetupConfig {
 
     @Test
     public void testLeshanClassesCanBeLoaded() {
-        final String[] leshanClasses = new String[] { "org.eclipse.leshan.server.LwM2mServer",
-                "org.eclipse.leshan.server.bootstrap.SecurityMode", "org.eclipse.leshan.server.client.Client",
-                "org.eclipse.leshan.server.impl.ClientRegistryImpl",
-                "org.eclipse.leshan.server.californium.impl.RegisterResource",
-                "org.eclipse.leshan.core.node.codec.LwM2mNodeEncoder",
-                "org.eclipse.leshan.core.objectspec.ResourceSpec",
-                "org.eclipse.leshan.server.californium.impl.SecureEndpoint", "org.eclipse.leshan.tlv.Tlv",
-                "org.eclipse.leshan.core.node.LwM2mNode", "org.eclipse.leshan.server.observation.Observation",
-                "org.eclipse.leshan.core.request.LwM2mRequest", "org.eclipse.leshan.server.security.SecurityInfo" };
+        loadClasses(LESHAN_CORE_CLASSES_TO_LOAD);
+        loadClasses(LESHAN_SERVER_CORE_CLASSES_TO_LOAD);
+        loadClasses(LESHAN_SERVER_CF_CLASSES_TO_LOAD);
+        loadClasses(LESHAN_CLIENT_CORE_CLASSES_TO_LOAD);
+        loadClasses(LESHAN_CLIENT_CF_CLASSES_TO_LOAD);
+    }
 
-        for (final String clazzName : leshanClasses) {
+    private void loadClasses(final String[] classNames) {
+        for (final String clazzName : classNames) {
             try {
                 context.getBundle().loadClass(clazzName);
             } catch (final ClassNotFoundException e) {
@@ -122,7 +193,7 @@ public class OsgiRegistryTest extends TestSetupConfig {
 
         final String updateSms = "00000000";
         final BindingMode updatebinding = BindingMode.UQS;
-        final long updateLifetime = client.getLifeTimeInSec() + 50000L;
+        final Long updateLifetime = client.getLifeTimeInSec() + 50000L;
         final Map<String, String> attribs = new HashMap<>();
         final LinkObject[] objectLinks = new LinkObject[] { new LinkObject("/3/1", attribs) };
 

@@ -49,17 +49,18 @@ public class TestSetupConfig {
                         Constants.START_LEVEL_SYSTEM_BUNDLES),
                 mavenBundle("ch.qos.logback", "logback-classic").versionAsInProject().startLevel(
                         Constants.START_LEVEL_SYSTEM_BUNDLES),
-                mavenBundle("commons-codec", "commons-codec").versionAsInProject(),
-                mavenBundle("commons-io", "commons-io").versionAsInProject(),
-                mavenBundle("commons-lang", "commons-lang").versionAsInProject(),
                 mavenBundle("com.google.code.gson", "gson").versionAsInProject(),
                 mavenBundle("org.osgi", "org.osgi.compendium").versionAsInProject(),
                 mavenBundle("org.eclipse.leshan", "leshan-core").versionAsInProject(),
+                mavenBundle("org.eclipse.leshan", "leshan-client-core").versionAsInProject(),
+                mavenBundle("org.eclipse.leshan", "leshan-client-cf").versionAsInProject(),
                 mavenBundle("org.eclipse.leshan", "leshan-server-core").versionAsInProject(),
                 mavenBundle("org.eclipse.leshan", "leshan-server-cf").versionAsInProject(),
                 mavenBundle("org.eclipse.leshan", "leshan-osgi").versionAsInProject(),
                 mavenBundle("org.eclipse.californium", "californium-osgi").versionAsInProject(),
-                mavenBundle("org.eclipse.californium", "scandium").versionAsInProject(), junitBundles() };
+                mavenBundle("org.eclipse.californium", "scandium").versionAsInProject(),
+                junitBundles()
+        };
 
         // workaround to determine if we are running on jenkins
         if ("jenkins".equals(System.getProperty("user.name"))) {

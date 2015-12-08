@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.eclipse.leshan</groupId>
 		<artifactId>leshan-osgi-parent</artifactId>
-		<version>0.1.10</version>
+		<version>0.1.11-M7-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>leshan-osgi</artifactId>
@@ -16,19 +16,15 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.eclipse.leshan</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>leshan-core</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>org.eclipse.leshan</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>leshan-server-core</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-slf4j-impl</artifactId>
-				</exclusion>
-			</exclusions>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -59,6 +55,22 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<_exportcontents>!*.impl.*, !*.internal.*, *</_exportcontents>
+						<Import-Package>*</Import-Package>
+						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

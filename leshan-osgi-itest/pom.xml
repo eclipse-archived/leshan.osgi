@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.eclipse.leshan</groupId>
 		<artifactId>leshan-osgi-parent</artifactId>
-		<version>0.1.10</version>
+		<version>0.1.11-M7-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>leshan-osgi-itest</artifactId>
@@ -32,12 +32,22 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.eclipse.leshan</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>leshan-core</artifactId>
+			<scope>test</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>org.eclipse.leshan</groupId>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>leshan-client-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>leshan-client-cf</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>leshan-server-core</artifactId>
 			<exclusions>
 				<exclusion>
@@ -45,17 +55,20 @@
 					<artifactId>log4j-slf4j-impl</artifactId>
 				</exclusion>
 			</exclusions>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>org.eclipse.leshan</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>leshan-server-cf</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>org.eclipse.leshan</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>leshan-osgi</artifactId>
 			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -73,6 +86,7 @@
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- ******************************** -->
@@ -83,12 +97,12 @@
 			<groupId>org.eclipse</groupId>
 			<artifactId>osgi</artifactId>
 			<version>${org.eclipse.osgi.version}</version>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.ops4j.pax.exam</groupId>
 			<artifactId>pax-exam-junit4</artifactId>
-			<scope>test</scope>
 			<version>${pax.version}</version>
 			<exclusions>
 				<exclusion>
@@ -96,6 +110,7 @@
 					<groupId>org.osgi</groupId>
 				</exclusion>
 			</exclusions>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.ops4j.pax.exam</groupId>
@@ -141,6 +156,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- ******************************** -->
@@ -149,6 +165,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.inject</groupId>
@@ -177,23 +194,6 @@
 		<!-- ******************************** -->
 		<!-- ********* 3party***************** -->
 		<!-- ******************************** -->
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<repositories>

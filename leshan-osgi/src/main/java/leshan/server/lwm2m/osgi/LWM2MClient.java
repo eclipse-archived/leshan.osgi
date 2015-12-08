@@ -25,8 +25,11 @@ import org.eclipse.leshan.core.request.ReadRequest;
 import org.eclipse.leshan.core.request.WriteAttributesRequest;
 import org.eclipse.leshan.core.request.WriteRequest;
 import org.eclipse.leshan.core.response.DiscoverResponse;
-import org.eclipse.leshan.core.response.LwM2mResponse;
-import org.eclipse.leshan.core.response.ValueResponse;
+import org.eclipse.leshan.core.response.ExecuteResponse;
+import org.eclipse.leshan.core.response.ObserveResponse;
+import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.core.response.WriteAttributesResponse;
+import org.eclipse.leshan.core.response.WriteResponse;
 import org.eclipse.leshan.server.client.Client;
 
 /**
@@ -42,7 +45,7 @@ public interface LWM2MClient {
      * @throws InterruptedException
      * @throws UnsupportedEncodingException
      */
-    ValueResponse read(ReadRequest readRequest) throws InterruptedException, UnsupportedEncodingException;
+    ReadResponse read(ReadRequest readRequest) throws InterruptedException, UnsupportedEncodingException;
 
     /**
      * Send a ExecuteRequest to the client.
@@ -52,7 +55,7 @@ public interface LWM2MClient {
      * @throws InterruptedException
      * @throws UnsupportedEncodingException
      */
-    LwM2mResponse execute(ExecuteRequest executeReqest);
+    ExecuteResponse execute(ExecuteRequest executeReqest);
 
     /**
      * Send a WriteRequest to the client.
@@ -62,7 +65,7 @@ public interface LWM2MClient {
      * @throws InterruptedException
      * @throws UnsupportedEncodingException
      */
-    LwM2mResponse write(WriteRequest writeRequest);
+    WriteResponse write(WriteRequest writeRequest);
 
     /**
      * Send a WriteAttributesRequest to the client.
@@ -72,7 +75,7 @@ public interface LWM2MClient {
      * @throws InterruptedException
      * @throws UnsupportedEncodingException
      */
-    LwM2mResponse writeAttribute(WriteAttributesRequest writeRequest);
+    WriteAttributesResponse writeAttribute(WriteAttributesRequest writeRequest);
 
     /**
      * Send a ObserveRequest to the client.
@@ -82,7 +85,7 @@ public interface LWM2MClient {
      * @throws InterruptedException
      * @throws UnsupportedEncodingException
      */
-    ValueResponse observe(ObserveRequest observeRequest);
+    ObserveResponse observe(ObserveRequest observeRequest);
 
     /**
      * Send a DiscoverRequest to the client.

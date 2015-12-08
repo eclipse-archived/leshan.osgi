@@ -28,8 +28,11 @@ import org.eclipse.leshan.core.request.ReadRequest;
 import org.eclipse.leshan.core.request.WriteAttributesRequest;
 import org.eclipse.leshan.core.request.WriteRequest;
 import org.eclipse.leshan.core.response.DiscoverResponse;
-import org.eclipse.leshan.core.response.LwM2mResponse;
-import org.eclipse.leshan.core.response.ValueResponse;
+import org.eclipse.leshan.core.response.ExecuteResponse;
+import org.eclipse.leshan.core.response.ObserveResponse;
+import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.core.response.WriteAttributesResponse;
+import org.eclipse.leshan.core.response.WriteResponse;
 import org.eclipse.leshan.server.client.Client;
 import org.eclipse.leshan.server.request.LwM2mRequestSender;
 import org.osgi.service.device.Constants;
@@ -42,10 +45,12 @@ import org.slf4j.LoggerFactory;
  */
 public class LWM2MClientDevice implements LWM2MClient {
 
+    private static final Logger LOG = LoggerFactory.getLogger(LWM2MClientDevice.class);
+    private static final long DEFAULT_RESPONSE_TIMEOUT = 2000L;
+
     private Client client;
 
     private final LwM2mRequestSender requestSender;
-    private static final Logger LOG = LoggerFactory.getLogger(LWM2MClientDevice.class);
 
     /**
      * Constructor for new LWM2MClientDevice.
@@ -59,39 +64,39 @@ public class LWM2MClientDevice implements LWM2MClient {
     }
 
     @Override
-    public ValueResponse read(final ReadRequest readRequest) throws InterruptedException, UnsupportedEncodingException {
+    public ReadResponse read(final ReadRequest readRequest) throws InterruptedException, UnsupportedEncodingException {
         LOG.trace("send ReadRequest to {}", client.getEndpoint());
-        return requestSender.send(client, readRequest);
+        return requestSender.send(client, readRequest, DEFAULT_RESPONSE_TIMEOUT);
     }
 
     @Override
-    public LwM2mResponse write(final WriteRequest writeRequest) {
+    public WriteResponse write(final WriteRequest writeRequest) {
         LOG.trace("send WriteRequest to {}", client.getEndpoint());
-        return requestSender.send(client, writeRequest);
+        return requestSender.send(client, writeRequest, DEFAULT_RESPONSE_TIMEOUT);
     }
 
     @Override
-    public LwM2mResponse writeAttribute(final WriteAttributesRequest writeRequest) {
+    public WriteAttributesResponse writeAttribute(final WriteAttributesRequest writeRequest) {
         LOG.trace("send WriteAttributesRequest to {}", client.getEndpoint());
-        return requestSender.send(client, writeRequest);
+        return requestSender.send(client, writeRequest, DEFAULT_RESPONSE_TIMEOUT);
     }
 
     @Override
-    public LwM2mResponse execute(final ExecuteRequest executeReqest) {
+    public ExecuteResponse execute(final ExecuteRequest executeReqest) {
         LOG.trace("send ExecuteRequest to {}", client.getEndpoint());
-        return requestSender.send(client, executeReqest);
+        return requestSender.send(client, executeReqest, DEFAULT_RESPONSE_TIMEOUT);
     }
 
     @Override
-    public ValueResponse observe(final ObserveRequest observeRequest) {
+    public ObserveResponse observe(final ObserveRequest observeRequest) {
         LOG.trace("send ObserveRequest to {}", client.getEndpoint());
-        return requestSender.send(client, observeRequest);
+        return requestSender.send(client, observeRequest, DEFAULT_RESPONSE_TIMEOUT);
     }
 
     @Override
     public DiscoverResponse discover(final DiscoverRequest discoverRequest) {
         LOG.trace("send ObserveRequest to {}", client.getEndpoint());
-        return requestSender.send(client, discoverRequest);
+        return requestSender.send(client, discoverRequest, DEFAULT_RESPONSE_TIMEOUT);
     }
 
     @Override
