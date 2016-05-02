@@ -17,6 +17,7 @@ package leshan.server.lwm2m.osgi;
 
 import static org.ops4j.pax.exam.CoreOptions.junitBundles;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.bundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
 import java.net.InetAddress;
@@ -56,7 +57,7 @@ public class TestSetupConfig {
                 mavenBundle("org.eclipse.leshan", "leshan-client-cf").versionAsInProject(),
                 mavenBundle("org.eclipse.leshan", "leshan-server-core").versionAsInProject(),
                 mavenBundle("org.eclipse.leshan", "leshan-server-cf").versionAsInProject(),
-                mavenBundle("org.eclipse.leshan", "leshan-osgi").versionAsInProject(),
+                bundle("assembly:../leshan-osgi/target/classes"),
                 mavenBundle("org.eclipse.californium", "californium-osgi").versionAsInProject(),
                 mavenBundle("org.eclipse.californium", "scandium").versionAsInProject(),
                 junitBundles()

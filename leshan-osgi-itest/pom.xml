@@ -119,6 +119,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.ops4j.pax.url</groupId>
+      <artifactId>pax-url-assembly</artifactId>
+      <version>2.1.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.ops4j.pax.exam</groupId>
       <artifactId>pax-exam-container-native</artifactId>
       <version>${pax.version}</version>
