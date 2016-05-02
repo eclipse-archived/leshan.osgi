@@ -55,7 +55,7 @@ public interface LWM2MClient {
      * @throws InterruptedException
      * @throws UnsupportedEncodingException
      */
-    ExecuteResponse execute(ExecuteRequest executeReqest);
+    ExecuteResponse execute(ExecuteRequest executeReqest) throws InterruptedException;
 
     /**
      * Send a WriteRequest to the client.
@@ -65,7 +65,7 @@ public interface LWM2MClient {
      * @throws InterruptedException
      * @throws UnsupportedEncodingException
      */
-    WriteResponse write(WriteRequest writeRequest);
+    WriteResponse write(WriteRequest writeRequest) throws InterruptedException;
 
     /**
      * Send a WriteAttributesRequest to the client.
@@ -75,7 +75,7 @@ public interface LWM2MClient {
      * @throws InterruptedException
      * @throws UnsupportedEncodingException
      */
-    WriteAttributesResponse writeAttribute(WriteAttributesRequest writeRequest);
+    WriteAttributesResponse writeAttribute(WriteAttributesRequest writeRequest) throws InterruptedException;
 
     /**
      * Send a ObserveRequest to the client.
@@ -85,7 +85,7 @@ public interface LWM2MClient {
      * @throws InterruptedException
      * @throws UnsupportedEncodingException
      */
-    ObserveResponse observe(ObserveRequest observeRequest);
+    ObserveResponse observe(ObserveRequest observeRequest) throws InterruptedException;
 
     /**
      * Send a DiscoverRequest to the client.
@@ -95,7 +95,7 @@ public interface LWM2MClient {
      * @throws InterruptedException
      * @throws UnsupportedEncodingException
      */
-    DiscoverResponse discover(DiscoverRequest discoverRequest);
+    DiscoverResponse discover(DiscoverRequest discoverRequest) throws InterruptedException;
 
     /**
      * return a {@link LinkObject}[] Array from the client.

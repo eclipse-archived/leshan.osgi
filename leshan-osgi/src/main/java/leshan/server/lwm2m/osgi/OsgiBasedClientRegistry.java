@@ -140,7 +140,7 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
             registration.setProperties(newProps);
 
             for (final ClientRegistryListener crl : crListeners) {
-                crl.updated(device.getClient());
+                crl.updated(clientUpdate, device.getClient());
             }
 
             return device.getClient();
@@ -336,9 +336,11 @@ public class OsgiBasedClientRegistry implements ClientRegistry {
                 sms = cl.getSmsNumber();
             }
 
-            final Client clientUpdated = new Client(cl.getRegistrationId(), cl.getEndpoint(), address, port,
-                cl.getLwM2mVersion(), lifetime, sms, bindingMode, lobj, cl.getRegistrationEndpointAddress(),
-                cl.getRegistrationDate(), lastUpdate);
+            Client.Builder builder = new Client.Builder(cl.getRegistrationId(), cl.getEndpoint(), address, port,
+                    cl.getRegistrationEndpointAddress());
+            final Client clientUpdated = builder.lwM2mVersion(cl.getLwM2mVersion()).lifeTimeInSec(lifetime)
+                    .smsNumber(sms).bindingMode(bindingMode).registrationDate(cl.getRegistrationDate())
+                    .objectLinks(lobj).lastUpdate(lastUpdate).build();
 
             device.updateClient(clientUpdated);
         }

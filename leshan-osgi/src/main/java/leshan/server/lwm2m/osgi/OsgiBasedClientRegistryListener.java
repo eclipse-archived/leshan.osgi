@@ -20,6 +20,7 @@ import java.util.Hashtable;
 
 import org.eclipse.leshan.server.client.Client;
 import org.eclipse.leshan.server.client.ClientRegistryListener;
+import org.eclipse.leshan.server.client.ClientUpdate;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
@@ -60,7 +61,7 @@ public class OsgiBasedClientRegistryListener implements ClientRegistryListener {
      * @param clientUpdated the client after the update
      */
     @Override
-    public void updated(final Client clientUpdated) {
+    public void updated(final ClientUpdate update, final Client clientUpdated) {
         sendEvent(Property.UPDATED_EVENT, clientUpdated);
 
     }
