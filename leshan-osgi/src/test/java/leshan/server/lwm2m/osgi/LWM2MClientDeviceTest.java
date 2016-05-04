@@ -33,7 +33,6 @@ import org.eclipse.leshan.core.request.ObserveRequest;
 import org.eclipse.leshan.core.request.ReadRequest;
 import org.eclipse.leshan.core.request.WriteAttributesRequest;
 import org.eclipse.leshan.core.request.WriteRequest;
-import org.eclipse.leshan.core.request.WriteRequest.Mode;
 import org.eclipse.leshan.server.client.Client;
 import org.eclipse.leshan.server.request.LwM2mRequestSender;
 import org.eclipse.leshan.util.RandomStringUtils;
@@ -76,7 +75,7 @@ public class LWM2MClientDeviceTest {
     public void testWrite() throws UnsupportedEncodingException, InterruptedException, UnknownHostException {
 
         final WriteRequest writeRequest =
-                new WriteRequest(Mode.REPLACE, 3, 0, 9, 55L); // new battery level: 55%
+                new WriteRequest(3, 0, 9, 55L); // new battery level: 55%
         final LWM2MClientDevice clientUnderTest = new LWM2MClientDevice(client, lwM2mRequestSenderMock);
         clientUnderTest.write(writeRequest);
 
@@ -140,8 +139,10 @@ public class LWM2MClientDeviceTest {
         final LinkObject[] objectLinks = new LinkObject[] { new LinkObject("/3/1", attribs),
                 new LinkObject("/1", attribs), new LinkObject("/1/52343", attribs),
                 new LinkObject("/13/52343", attribs), new LinkObject("/567/45", attribs) };
-        final Client c = new Client(registrationId, endpoint, address, port, lwM2mVersion, lifetimeInSec, smsNumber,
-                bindingMode, objectLinks, InetSocketAddress.createUnresolved("localhost", 5683));
+        Client.Builder builder = new Client.Builder(registrationId, endpoint, address, port,
+                InetSocketAddress.createUnresolved("localhost", 5683));
+        final Client c = builder.lwM2mVersion(lwM2mVersion).lifeTimeInSec(lifetimeInSec).smsNumber(smsNumber)
+                .bindingMode(bindingMode).objectLinks(objectLinks).build();
 
         return c;
     }
