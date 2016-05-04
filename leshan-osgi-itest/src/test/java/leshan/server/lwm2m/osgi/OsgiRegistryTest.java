@@ -280,9 +280,10 @@ public class OsgiRegistryTest extends TestSetupConfig {
         final LinkObject[] objectLinks = new LinkObject[] { new LinkObject("/3/1", attribs),
                 new LinkObject("/1", attribs), new LinkObject("/1/52343", attribs),
                 new LinkObject("/13/52343", attribs), new LinkObject("/567/45", attribs) };
-        final Client c = new Client(registrationId, endpoint, address, port, lwM2mVersion, lifetimeInSec, smsNumber,
-            bindingMode, objectLinks, InetSocketAddress.createUnresolved("localhost", 5683));
-
+        Client.Builder builder = new Client.Builder(registrationId, endpoint, address, port,
+                InetSocketAddress.createUnresolved("localhost", 5683));
+        final Client c = builder.lwM2mVersion(lwM2mVersion).lifeTimeInSec(lifetimeInSec).smsNumber(smsNumber)
+                .bindingMode(bindingMode).objectLinks(objectLinks).build();
         return c;
     }
 }

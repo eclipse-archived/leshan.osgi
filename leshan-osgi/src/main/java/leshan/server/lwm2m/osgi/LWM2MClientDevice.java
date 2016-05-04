@@ -70,31 +70,31 @@ public class LWM2MClientDevice implements LWM2MClient {
     }
 
     @Override
-    public WriteResponse write(final WriteRequest writeRequest) {
+    public WriteResponse write(final WriteRequest writeRequest) throws InterruptedException {
         LOG.trace("send WriteRequest to {}", client.getEndpoint());
         return requestSender.send(client, writeRequest, DEFAULT_RESPONSE_TIMEOUT);
     }
 
     @Override
-    public WriteAttributesResponse writeAttribute(final WriteAttributesRequest writeRequest) {
+    public WriteAttributesResponse writeAttribute(final WriteAttributesRequest writeRequest) throws InterruptedException {
         LOG.trace("send WriteAttributesRequest to {}", client.getEndpoint());
         return requestSender.send(client, writeRequest, DEFAULT_RESPONSE_TIMEOUT);
     }
 
     @Override
-    public ExecuteResponse execute(final ExecuteRequest executeReqest) {
+    public ExecuteResponse execute(final ExecuteRequest executeReqest) throws InterruptedException {
         LOG.trace("send ExecuteRequest to {}", client.getEndpoint());
         return requestSender.send(client, executeReqest, DEFAULT_RESPONSE_TIMEOUT);
     }
 
     @Override
-    public ObserveResponse observe(final ObserveRequest observeRequest) {
+    public ObserveResponse observe(final ObserveRequest observeRequest) throws InterruptedException {
         LOG.trace("send ObserveRequest to {}", client.getEndpoint());
         return requestSender.send(client, observeRequest, DEFAULT_RESPONSE_TIMEOUT);
     }
 
     @Override
-    public DiscoverResponse discover(final DiscoverRequest discoverRequest) {
+    public DiscoverResponse discover(final DiscoverRequest discoverRequest) throws InterruptedException {
         LOG.trace("send ObserveRequest to {}", client.getEndpoint());
         return requestSender.send(client, discoverRequest, DEFAULT_RESPONSE_TIMEOUT);
     }
