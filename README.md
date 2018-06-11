@@ -1,3 +1,5 @@
+**:warning: This project is not maintained anymore. :warning:**
+
 # leshan.osgi
 Leshan OSGi provides an adapter layer between the core leshan library and an OSGi framework.
 The adapter layer includes
